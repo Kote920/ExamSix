@@ -14,7 +14,7 @@ import com.example.examsix.domain.Type
 
 
 
-class AuthorizationRecyclerAdapter :
+class AuthorizationRecyclerAdapter( private val onItemClick: () -> Unit) :
     ListAdapter<Item, RecyclerView.ViewHolder>(object : DiffUtil.ItemCallback<Item>() {
         override fun areItemsTheSame(oldItem: Item, newItem: Item): Boolean {
             return oldItem.id == newItem.id
@@ -103,19 +103,21 @@ class AuthorizationRecyclerAdapter :
         }
 
     }
-
     inner class RemoveViewHolder(private val binding: ItemRecyclerviewBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind() {
-            listeners()
-        }
-
-        private fun listeners() {
-            binding.root.setOnClickListener {
-                itemOnClickClear.invoke()
+        init {
+            binding.root.setOnClickListener{
+                onItemClick()
             }
+            binding.ibIcon.setOnClickListener{
+                onItemClick()
+            }
+        }
+        fun bind() {
 
         }
+
+
 
     }
 
@@ -124,43 +126,7 @@ class AuthorizationRecyclerAdapter :
         fun bind() {
 
         }
-//        private fun authenticateUserWithFingerprint() {
-//            val promptInfo = BiometricPrompt.PromptInfo.Builder()
-//                .setTitle("Fingerprint Authentication")
-//                .setSubtitle("Authenticate using your fingerprint")
-//                .setNegativeButtonText("Cancel")
-//                .build()
-//
-//            val biometricPrompt = BiometricPrompt(
-//                this,
-//                mainExecutor,
-//                object : BiometricPrompt.AuthenticationCallback() {
-//                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-//                        super.onAuthenticationError(errorCode, errString)
-//                        // Handle authentication error
-//                    }
-//
-//                    override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-//                        super.onAuthenticationSucceeded(result)
-//                        // Authentication successful
-//                        // Proceed with necessary actions after successful authentication
-//                    }
-//
-//                    override fun onAuthenticationFailed() {
-//                        super.onAuthenticationFailed()
-//                        // Authentication failed
-//                    }
-//                })
-//
-//            biometricPrompt.authenticate(promptInfo)
-//        }
 
-        private fun listeners(item: Item) {
-            binding.root.setOnClickListener {
-//                authenticateUserWithFingerprint()
-            }
-
-        }
 
     }
 }

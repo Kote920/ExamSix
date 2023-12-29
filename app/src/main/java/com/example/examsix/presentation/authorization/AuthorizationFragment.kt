@@ -1,14 +1,21 @@
 package com.example.examsix.presentation.authorization
 
-import android.content.Context
-import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
+import android.Manifest
+import android.content.pm.PackageManager
+import android.graphics.Rect
+import android.hardware.biometrics.BiometricPrompt.CryptoObject
+import android.os.Build
+import android.util.Log.d
 import android.view.View
-import android.view.ViewGroup
+
+import android.widget.Button
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.hardware.fingerprint.FingerprintManagerCompat
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.examsix.R
 import com.example.examsix.databinding.FragmentAuthorizationBinding
 import com.example.examsix.di.StaticDataProvider
@@ -16,13 +23,22 @@ import com.example.examsix.presentation.BaseFragment
 import dagger.hilt.EntryPoint
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import java.security.KeyStore
+import javax.crypto.Cipher
+import javax.crypto.KeyGenerator
+import javax.crypto.SecretKey
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
 
 @AndroidEntryPoint
 class AuthorizationFragment :
     BaseFragment<FragmentAuthorizationBinding>(FragmentAuthorizationBinding::inflate) {
-
+    private val KEY_NAME = "my_key_alias"
+    private lateinit var cipher: Cipher
     private lateinit var adapter: AuthorizationRecyclerAdapter
     private var input = mutableListOf<Int>()
+    private lateinit var cryptoObject: FingerprintManagerCompat.CryptoObject
+
     @Inject
     lateinit var staticDataProvider: StaticDataProvider
 
@@ -38,7 +54,13 @@ class AuthorizationFragment :
 
     private fun initItemRecycler() {
 
-        adapter = AuthorizationRecyclerAdapter()
+        adapter = AuthorizationRecyclerAdapter {
+            if(input.isNotEmpty()){
+            input.removeAt(input.lastIndex)
+            dotsManagement()
+            }
+        }
+
         binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
         binding.recyclerView.adapter = adapter
         adapter.apply {
@@ -53,11 +75,6 @@ class AuthorizationFragment :
                 }
             }
 
-
-            itemOnClickClear = {
-                // Other logic...
-                dotsManagement()
-            }
 
         }
 
@@ -74,6 +91,7 @@ class AuthorizationFragment :
             dotsManagement()
         }
     }
+
     private fun dotsManagement() {
         val dotImageViews = arrayOf(
             binding.ivDigit1,
@@ -82,13 +100,15 @@ class AuthorizationFragment :
             binding.ivDigit4
         )
 
-        // Loop through dotImageViews and set the appropriate image resource
+
         for (i in dotImageViews.indices) {
             if (i < input.size) {
-                dotImageViews[i].setImageResource(R.drawable.green) // Use your green dot drawable
+                dotImageViews[i].setImageResource(R.drawable.green)
             } else {
-                dotImageViews[i].setImageResource(R.drawable.grey) // Use your grey dot drawable
+                dotImageViews[i].setImageResource(R.drawable.grey)
             }
         }
     }
+
 }
+

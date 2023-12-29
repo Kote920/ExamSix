@@ -61,6 +61,7 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.47")
     kapt("com.google.dagger:hilt-android-compiler:2.47")
 
+
 }
 kapt {
     correctErrorTypes = true
